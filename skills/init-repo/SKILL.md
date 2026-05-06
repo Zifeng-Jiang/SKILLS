@@ -1,6 +1,7 @@
 ---
 name: init-repo
 description: Initialize a project repository by creating standard `.gitignore`, `.cursorignore` files and default scaffolding directories (`docs/`, `ref/`, `data/`, `output/`) with `.gitkeep` placeholders. Use when the user asks to initialize a repo, set up a new project structure, scaffold a Python project, or invokes `/init-repo`.
+disable-model-invocation: true
 ---
 
 # Init Repo

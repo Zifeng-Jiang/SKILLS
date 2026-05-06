@@ -1,31 +1,30 @@
 # SKILLS
 
-个人跨机器同步的 AI 工具配置仓库，包含 Agent Skills、Slash Commands 以及（未来的）Hooks。
+个人跨机器同步的 AI 工具配置仓库，主要承载 Agent Skills，并预留 Cursor 专属 Slash Commands、Hooks 的位置。
 
 ## 目录结构
 
 ```
 SKILLS/
-├── skills/         # 通用 Agent Skills（遵循 agentskills.io 开放标准）
+├── skills/         # 通用 Agent Skills（遵循 agentskills.io 开放标准，跨工具复用）
 │   └── <skill-name>/
 │       └── SKILL.md
-├── commands/       # Slash Commands（目前用于 Cursor）
-│   └── <command>.md
+├── commands/       # Cursor 专属 Slash Commands（预留；优先把命令做成带 disable-model-invocation 的 skill）
 ├── hooks/          # Hooks 脚本（预留）
 └── README.md
 ```
 
 ## 当前 Skills 列表
 
-| 名称 | 说明 |
-| ---- | ---- |
-| `init-repo` | 初始化项目仓库：创建 `.gitignore` / `.cursorignore` 与 `docs/` `ref/` `data/` `output/` 等默认目录 |
+| 名称 | 触发方式 | 说明 |
+| ---- | -------- | ---- |
+| `init-repo` | 显式输入 `/init-repo`（带 `disable-model-invocation: true`，模型不会自动调用） | 初始化项目仓库：创建 `.gitignore` / `.cursorignore` 与 `docs/` `ref/` `data/` `output/` 等默认目录 |
 
 ## 当前 Commands 列表
 
-| 名称 | 触发方式 | 说明 |
-| ---- | -------- | ---- |
-| `init-repo` | 在 Cursor 聊天中输入 `/init-repo` | 同上，slash 命令版本 |
+> 暂无。一般场景请优先把命令做成带 `disable-model-invocation: true` 的 Skill —— 这样**既能像 slash command 那样显式调用**，又能跨工具复用（Cursor / Claude Code / Codex 等）。
+
+只有在 Skill 形态实在表达不了、且只服务于 Cursor 的命令，才放进 `commands/`。
 
 ## 在新机器上恢复（Windows）
 
