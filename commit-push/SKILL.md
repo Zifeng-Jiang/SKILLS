@@ -23,23 +23,17 @@ Use this skill when the user explicitly asks to commit and push changes.
    - If switching or stash pop causes conflicts, stop and ask the user.
    - If no default branch can be detected and no `dev`/`main` branch exists, stay on the current branch.
 
-3. Sensitive file safety before `git add .`:
+3. Environment file safety before `git add .`:
    - Check whether `.gitignore` exists.
-   - Check whether `.gitignore` excludes common sensitive files, at minimum:
-     - `.env`
-     - `.env.*`
-     - `*.key`
-     - `*.pem`
-     - `credentials.json`
-     - `secrets.json`
-     - `*.secret`
-   - If sensitive rules are missing, add them to `.gitignore` before staging.
+   - Check whether `.gitignore` excludes `.env`.
+   - If `.env` is missing from `.gitignore`, add only `.env` before staging.
+   - Do not add broad ignore rules such as `*.key`, `*.pem`, `credentials.json`, or `secrets.json` unless the user explicitly asks.
    - Do not read `.env` or print secret values.
 
 4. Stage and verify:
    - Run `git add .`.
    - Run `git status --short --branch --untracked-files=all`.
-   - If `.env`, credential files, keys, tokens, or other sensitive files are staged, unstage them and ensure `.gitignore` excludes them.
+   - If `.env` is staged, unstage it and ensure `.gitignore` excludes it.
    - Review staged diff with `git diff --staged`.
 
 5. Write a Conventional Commit message:
