@@ -2,18 +2,19 @@
 name: arabic-translate
 description: >-
   Translates benchmark items from a source language (English, Chinese, or other)
-  into Modern Standard Arabic (MSA) while preserving gold labels and task
-  semantics. Applies XNLI-style context isolation (translate linked fields
+  into Omani Arabic (official Muscat register) while preserving gold labels and
+  task semantics. Applies XNLI-style context isolation (translate linked fields
   separately) and mandatory label-drift spot checks. Use when translating
   evaluation datasets, MCQ/NLI/QA items, or any labeled benchmark content into
-  Arabic from any source language.
+  Omani Arabic from any source language.
 disable-model-invocation: true
 ---
 
-# Arabic Benchmark Translation
+# Omani Arabic Benchmark Translation
 
-Translate labeled benchmark items **into Modern Standard Arabic (MSA)** from a
-**source language** specified by the user (commonly English or Chinese).
+Translate labeled benchmark items **into Omani Arabic** — the **official /
+Muscat register** (اللهجة العُمانية الرسمية / لهجة مسقط) — from a **source
+language** specified by the user (commonly English or Chinese).
 
 Follow the methodology of Conneau et al. (2018, XNLI, arXiv:1809.05053): isolate
 context during translation, copy labels from source, then verify labels did not drift.
@@ -21,7 +22,7 @@ context during translation, copy labels from source, then verify labels did not 
 ## Before starting
 
 1. **Confirm source language** with the user if not stated (e.g. `en`, `zh`).
-2. Record source language in output metadata or filename (e.g. `Earth-Silver__mc.zh2ar.jsonl`).
+2. Record source and target in output metadata or filename (e.g. `Earth-Silver__mc.en2ar-om.jsonl`).
 3. Apply the same isolation and label-audit rules regardless of source language.
 
 ## Core principles (from XNLI)
@@ -48,22 +49,22 @@ logically paired.
 
 1. List all translatable fields and their isolation groups.
 2. Translate each field alone from the source language; do not show sibling fields or the gold label.
-3. Assemble the Arabic item only after all fields are done.
+3. Assemble the Omani Arabic item only after all fields are done.
 4. Copy `answer`, `label`, or boolean gold **verbatim from the source dataset** — do not re-derive from Arabic text.
 
 ### 2. Label drift — assume labels can break; spot-check is mandatory
 
 **Problem:** Translation can add/remove negation, shift modality, or change entity
-relations so the **gold label no longer holds** in Arabic. XNLI found rare but real
-cases (e.g. English *upright* entailment → Chinese *sitting upright* → contradiction).
-Labels copied from the source are an **assumption**, not a guarantee.
+relations so the **gold label no longer holds** in Omani Arabic. Dialectal
+renderings amplify this risk (e.g. negation particles, aspect, scope). Labels
+copied from the source are an **assumption**, not a guarantee.
 
 **Rule:** After bulk translation, run a structured label audit before shipping.
 
 **Minimum audit (adapt size to corpus):**
 
 - Random sample **≥100 items** (or 10–15% of dev set, whichever is larger).
-- Bilingual reviewer (Arabic + source language) re-labels from **Arabic only** — no source text visible.
+- Bilingual reviewer (Omani Arabic + source language) re-labels from **Arabic only** — no source text visible.
 - Compare recovered label vs copied gold; track agreement rate.
 - XNLI baseline: ~83–85% agreement is acceptable for human translation; **investigate all mismatches**.
 - Prioritize audit on: negation, comparatives, quantifiers, temporal/aspect, entailment/contradiction pairs, and domain polysemy.
@@ -87,7 +88,7 @@ Apply the section that matches the confirmed source language.
 
 ### From Chinese (`zh`)
 
-- Use **Modern Standard Arabic**, not dialect; source may be simplified or traditional — confirm with user.
+- Target **Omani Arabic (Muscat)**, not MSA-only or other dialects; source may be simplified or traditional — confirm with user.
 - **Negation:** Map 不/没/未/无/非 explicitly; do not soften or drop double negatives.
 - **Polysemy:** Chinese compact phrasing often hides modality or scope — verify entailment/contradiction pairs extra carefully in audit.
 - **Proper nouns & terms:** Transliterate or use established Arabic equivalents for place names and geoscience terms; keep Latin abbreviations (SMAP, DEM, LiDAR) unchanged.
@@ -98,21 +99,46 @@ Apply the section that matches the confirmed source language.
 - Mirror the same isolation and audit rules.
 - Document source-specific negation markers and common drift patterns before bulk translation.
 
-## Arabic target guidelines
+## Omani Arabic target guidelines (Muscat / official register)
 
-- **Register:** MSA for benchmark text; avoid dialect unless the source explicitly requires it.
-- **Script:** Arabic script only for body text; keep JSON keys, option letters (`A`–`D`), indices, and enum labels in source schema.
+**Register goal:** Write as an educated Muscat speaker would in **formal official
+context** — government, education, news, technical reports — not casual street
+slang, not Egyptian/Levantine/Maghrebi dialect, and not textbook MSA detached
+from Oman.
+
+| Do | Avoid |
+|----|-------|
+| Omani/Gulf vocabulary and syntax natural to Muscat | Egyptian (مش، عايز), Levantine (هلّق، كتير), Maghrebi forms |
+| Clear, label-stable negation (see below) | Over-colloquial particles that blur yes/no scope |
+| Arabic script throughout body text | Latinizing Arabic words |
+| Latin abbreviations (MODIS, Landsat, NDVI) unchanged | Inventing Omani-only terms for standard science abbreviations |
+
+**Negation (label-critical):**
+
+- Preserve source negation explicitly; never drop or soften for fluency.
+- Prefer unambiguous Muscat-official patterns, e.g. **ما** + verb, **مو/مب** + adjective/noun where scope stays clear.
+- For benchmark yes/no questions, favor constructions a Muscat reader can answer without ambiguity over purely conversational shortcuts.
+
+**Syntax & lexicon:**
+
+- Use Gulf/Omani question frames where natural: **هل**، **ش** (in fixed question patterns), **وين**، **متى**، **ليش** when appropriate to Muscat usage.
+- Prefer Omani/Gulf terms over other-dialect equivalents (e.g. **دحين/ الحين** for time reference when needed — pick one consistently within a dataset).
+- For geoscience / remote-sensing content: use terms familiar from Omani Arabic media and ministry publications; fall back to widely understood formal Arabic equivalents only when no Muscat-natural term exists.
+
+**Script & data layout:**
+
+- Arabic script only for body text; keep JSON keys, option letters (`A`–`D`), indices, and enum labels in source schema.
 - **RTL:** Preserve logical field order in data files; do not reorder options for readability.
-- **Technical terms:** Prefer established Arabic equivalents in Earth/remote-sensing/geoscience literature; keep unavoidable Latin abbreviations unchanged.
-- **Numbers/units:** Keep SI units; localize number formatting only if the downstream evaluator expects it.
+- **Numbers/units:** Keep SI units and numeric values; localize formatting only if the downstream evaluator expects it.
 
 ## Translation pass checklist
 
 Copy and track:
 
 ```
-Arabic translation progress:
+Omani Arabic translation progress:
 - [ ] Source language confirmed (en / zh / other)
+- [ ] Target register confirmed: Omani Arabic (official / Muscat)
 - [ ] Field isolation map written for this dataset schema
 - [ ] Bulk translate: stems / passages / hypotheses (no labels, no paired fields)
 - [ ] Bulk translate: each option / hypothesis variant in isolation
@@ -128,14 +154,16 @@ Arabic translation progress:
 - One output row per source row; same `idx`, `answer`/`label`, metadata keys.
 - Translate human-readable string fields only unless user specifies otherwise.
 - Do **not** translate `reasoning_chain` or other fields marked eval-only unless explicitly requested.
+- Optionally record `"target_language": "ar-om"` and `"target_register": "Omani Arabic (Muscat official)"` in `meta.json`.
 
 ## When automating with an LLM
 
 LLM translators exhibit the same "repair" bias as human translators. Mitigations:
 
-1. One API call per isolated field; system prompt states source language and forbids seeing other fields or the label.
-2. Second pass: Arabic-only label verification on the sample (different prompt, no source text).
-3. Never ask the model to "pick the correct option" during translation.
+1. One API call per isolated field; system prompt states source language, **Omani Arabic (Muscat official)**, and forbids seeing other fields or the label.
+2. Explicitly forbid MSA-only, Egyptian, Levantine, or Maghrebi output in the prompt.
+3. Second pass: Arabic-only label verification on the sample (different prompt, no source text).
+4. Never ask the model to "pick the correct option" during translation.
 
 ## References
 
