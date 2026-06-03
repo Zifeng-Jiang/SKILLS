@@ -161,14 +161,43 @@ For each **critical** finding:
 
 ## Slack delivery
 
-- **Invoked from Slack** (e.g. tagging `@Cursor` in a channel): reply with the report in the
-  triggering thread.
-- **Run as an Automation** with a "Post to Slack" action: emit the report so the action posts
-  it to the configured channel.
-- **Manual IDE run** with no Slack tool available: print the same Slack-formatted report in
-  chat (简体中文) so the user can copy it.
-
 Always produce exactly **one message per run** in the formats below. Use **short sha** in the body.
+
+### Local IDE run (default for this setup — intranet repos)
+
+Cloud agents cannot reach intranet repos, so this skill runs in the local Cursor IDE and posts
+to Slack via an **Incoming Webhook** stored in the user environment variable
+`BUGFINDER_SLACK_WEBHOOK` (channel: `terra-agent`). The URL is a secret — it lives only in the
+env var, never in any file or commit.
+
+After producing the final report, post it like this (PowerShell):
+
+1. Write the full Slack report text to a temp file (avoids quoting/newline issues):
+   - path: `$env:TEMP\bugfinder-report.txt` (UTF-8).
+2. Read it and POST as JSON `{"text": ...}` to the webhook:
+
+```powershell
+if (-not $env:BUGFINDER_SLACK_WEBHOOK) {
+  Write-Output "NO_WEBHOOK: print report in chat instead"
+} else {
+  $text = Get-Content -Raw -Encoding UTF8 "$env:TEMP\bugfinder-report.txt"
+  $body = @{ text = $text } | ConvertTo-Json -Compress
+  $r = Invoke-RestMethod -Uri $env:BUGFINDER_SLACK_WEBHOOK -Method Post `
+        -ContentType 'application/json; charset=utf-8' `
+        -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
+  Write-Output "SLACK: $r"   # expect "ok"
+}
+```
+
+- If `$env:BUGFINDER_SLACK_WEBHOOK` is missing → **fall back** to printing the report in chat; do not error.
+- Also print the report in chat so the user sees it without switching apps.
+- Slack mrkdwn uses single `*` for bold; `**...**` will render literally. Keep it readable;
+  optionally convert `**x**` → `*x*` for the Slack copy only.
+
+### Other contexts (not used for TerraAgent)
+
+- **Invoked from Slack** (`@Cursor` in a channel): reply in the triggering thread.
+- **Automation with a "Post to Slack" action**: emit the report for the action to post.
 
 ---
 
