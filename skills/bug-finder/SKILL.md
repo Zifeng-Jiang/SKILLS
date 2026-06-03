@@ -6,7 +6,6 @@ description: >-
   reports only critical logic/security issues, and produces a Slack report in
   简体中文. Read-only: never edits code, commits, pushes, or opens PRs. Use when
   the user says "bug finder", "审查 dev", "找严重 bug", or invokes bug-finder.
-disable-model-invocation: true
 ---
 
 # Bug Finder
