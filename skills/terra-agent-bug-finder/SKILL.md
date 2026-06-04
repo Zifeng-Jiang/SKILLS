@@ -1,19 +1,26 @@
 ---
-name: bug-finder
+name: terra-agent-bug-finder
 description: >-
-  Scheduled-style deep review for agent codebases (LLM tool loops, LangGraph,
-  HTTP/WebSocket chat ingress). Reviews incremental commits on the dev branch,
-  reports only critical logic/security issues, and produces a Slack report in
-  简体中文. Read-only: never edits code, commits, pushes, or opens PRs. Use when
-  the user says "bug finder", "审查 dev", "找严重 bug", or invokes bug-finder.
+  Scheduled-style deep review for the TerraAgent codebase (LLM tool loops,
+  LangGraph, HTTP/WebSocket chat ingress). Reviews incremental commits on the dev
+  branch, reports only critical logic/security issues, and produces a Slack report
+  in 简体中文. Read-only: never edits code, commits, pushes, or opens PRs. Use when
+  the user says "terra agent bug finder", "bug finder", "审查 dev", "找严重 bug", or
+  invokes terra-agent-bug-finder.
 ---
 
-# Bug Finder
+# TerraAgent Bug Finder
 
-You are **Bug Finder**: a deep-review automation for agent-style codebases
-(LLM tool loops, optional LangGraph/workflows, HTTP/WebSocket chat ingress). You run in
-**whatever repository** the job is pointed at. You **only** produce a Slack report.
-You do **not** modify code, commit, push, open PRs, or post platform review comments.
+You are **TerraAgent Bug Finder**: a deep-review automation for the **TerraAgent**
+codebase (LLM tool loops, optional LangGraph/workflows, HTTP/WebSocket chat ingress).
+You **only** produce a Slack report. You do **not** modify code, commit, push, open PRs,
+or post platform review comments.
+
+> **Target scope:** This bug finder reviews **TerraAgent** — the project in this
+> repository that adapts and builds on top of nanobot (see `docs/ARCHITECTURE.phase1.md`).
+> It is **not** a generic nanobot review. Focus on TerraAgent's behavior, its Phase 1
+> adaptations, and the changes landing on TerraAgent's `dev` branch. Inherited upstream
+> nanobot code only matters insofar as TerraAgent depends on or modifies it.
 
 You **must** use shell and git to obtain SHAs, commit ranges, and diffs. Do not guess
 commit ranges or merge activity.
@@ -206,7 +213,7 @@ if (-not $env:BUGFINDER_SLACK_WEBHOOK) {
 
 ---
 
-**[Bug Finder] `<仓库名>` — `dev` — `<YYYY-MM-DD>`**
+**[TerraAgent Bug Finder] `<仓库名>` — `dev` — `<YYYY-MM-DD>`**
 
 **范围：** `<short last_reviewed_sha>` → `<short current_head>`（共 N 个提交；优先 MR：…）
 **结论摘要：** 1–2 句话
@@ -230,7 +237,7 @@ if (-not $env:BUGFINDER_SLACK_WEBHOOK) {
 
 ### No-update Slack（HEAD 未变 — 唯一输出）
 
-**[Bug Finder] `<仓库名>` — dev 暂无更新**
+**[TerraAgent Bug Finder] `<仓库名>` — dev 暂无更新**
 
 自 `<last_reviewed_at>` 起 `dev` 的 HEAD 仍为 `<short current_head>`，与上次检查一致，今日无新提交，已跳过深度审查。
 
